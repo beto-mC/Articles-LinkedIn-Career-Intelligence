@@ -49,6 +49,8 @@ Trust, permission, money, and the physical world do not move at software speed.
 ## Companion media
 
 - [AI Speedboats versus Corporate Cargo Ships (audio)](./AI_Speedboats_versus_Corporate_Cargo_Ships.m4a)
+- [AI with the AI Quotient (website audio)](../../mC%20-%20Beto%20Pubs/Website_-_AI_with_the_AI_Quotient.m4a)
+- [Lead your work like an AI conductor (Amara audio)](../../mC%20-%20Publications/Amara_-_LinkedInLead_your_work_like_an_AI_conductor.m4a)
 - [AI Quotient thesis infographic (PNG)](./mC_AIQ_Thesis_Infographic_v26.09.21.3-BC.png)
 - [AI Quotient thesis infographic (SVG)](./mC_AIQ_Thesis_Infographic_v26.09.21.3-BC.svg)
 - [AI Quotient thesis infographic (PDF)](./mC_AIQ_Thesis_Infographic_v26.09.21.3-BC.pdf)
