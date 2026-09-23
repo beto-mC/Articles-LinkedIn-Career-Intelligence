@@ -1,0 +1,44 @@
+# COPY this file into your new article folder (articles/YYYY-MM-DD-your-slug/audio.yml),
+# fill it in, commit. Folders starting with "_" are never built. See UPDATING.md.
+slug: YYYY-MM-DD-your-slug
+status: draft                # draft until you are happy, then: published
+date: YYYY-MM-DD
+series: ""
+title: ""
+title_accent: ""             # optional: the ending of the title to set in gold italic
+badge: "Audio · SERIES · YY.MM.DD"
+description: ""              # one sentence, under 160 characters (search result snippet)
+deck: ""
+define: ""                   # optional; **bold** allowed
+canonical_article: ""        # the article page on main-character.me
+notes_url: ""
+keywords: []
+thesis:                      # optional block; delete it if the page is audio only
+  eyebrow: ""
+  heading: ""
+  lead: ""
+  body: ""
+  steps: []                  # - {k: "", h: "", p: ""}
+  ideas_label: ""
+  ideas: []                  # - {t: "", p: ""}
+  pull: ""
+  pull_cite: ""
+  closing_line: ""
+questions: []                # - {q: "", a: ""}  answers quoted from the article
+audio:
+  - id: short-kebab-name     # becomes the download file names
+    title: ""
+    kind: ""                 # e.g. Companion audio, LinkedIn audio
+    master: ""               # repo path to the .m4a/.mp3/.wav exported from Gemini Notebook
+    generator: "Gemini Notebook (formerly NotebookLM)"
+    generator_format: ""     # Deep Dive | The Brief | The Critique | The Debate
+    generator_basis: ""      # internal: how you know
+    voices: 2
+    transcript_source: ""      # e.g. "ElevenLabs Scribe v1 machine transcription"
+    speaker_labels: voice     # voice (from the transcription tool) | text (assigned by reading)
+    summary: ""              # 2-3 sentences, what the listener gets
+    listen_for: ""
+    notes: []                # corrections, unverified claims, illustrative personas
+    references: []           # - {label: "", url: ""}
+    # transcript: put transcripts/<id>.txt next to this file. Lines start with
+    # "Speaker 1:" or "Character 1:" — the build relabels Speaker N as Character N.
