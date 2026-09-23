@@ -23,6 +23,7 @@ same_as:
 brand_base: https://cdn.jsdelivr.net/gh/mAInCharacter-me/mc-brand-assets@v1.1.0
 # Download formats, in display order. WAV adds about 10 MB per minute of audio.
 formats: [mp3, m4a, wav]
+size_budget_mb: 750          # the build fails above this (GitHub Pages sites should stay under 1 GB)
 # AI crawler policy for robots.txt: search/answer bots are always allowed.
 # 'block' keeps model-training crawlers out; 'allow' lets them in.
 ai_training_crawlers: block
