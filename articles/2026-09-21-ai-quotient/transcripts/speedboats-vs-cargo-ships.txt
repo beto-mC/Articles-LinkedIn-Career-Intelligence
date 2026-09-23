@@ -1,0 +1,49 @@
+Character 1: Welcome to the debate. Um, imagine an AI just completed, I don't know, a hundred and thirty-five hours of high-level consulting work overnight for zero dollars.
+Character 2: Right. Which is just wild to think about.
+Character 1: It really is, and it brings up this central tension we're looking at today from Beto Caruso's September 2026 live draft. Essentially, you know, how should professionals capture AI's value?
+Character 2: Exactly.
+Character 1: I'll be arguing for the outside wedge, building lean AI native services externally. It's, uh, it's like launching a nimble speedboat that just completely bypasses the sluggish corporate cargo ship.
+Character 2: Well, I'm taking the other side. I'm defending Caruso's inside wedge because, look, no matter how fast that speedboat is, the cargo ship still holds all the paying customers.
+Character 1: Right.
+Character 2: Real leverage comes from earning trust within your existing institution, not abandoning it. It's about taking one understood piece of work, proving you can improve it with AI and, you know, converting that trust into a better role or compensation.
+Character 1: I mean, bypassing that institutional friction entirely is just so much cleaner, though.
+Character 2: Is it, though?
+Character 1: Oh, definitely. You sell a completed piece of work as a service, build a lean team, and let the software follow. I mean, look at the recent Madison test.
+Character 2: Okay, yeah, the Madison test.
+Character 1: Right. So, um, an AI assistant tackled complex analytical work. It executed eight hours and fifteen minutes of work overnight. That translated to roughly a hundred and thirty-five human hours.
+Character 2: Wow.
+Character 1: Delivering up to forty-five thousand dollars in consulting value, and the cost was zero dollars. I mean, when you can generate that kind of value on the outside, internal corporate bureaucracy just becomes obsolete.
+Character 2: Okay, but let's be fair. The AI definitely did the groundwork perfectly in that test, but remember the caveat. That output was strictly a preparation layer.
+Character 1: Sure, but-
+Character 2: It wasn't the finished job. You can't just drop an unreviewed, unverified AI output on a client's desk. Diagnosis, relationships, accountability, those are still entirely human.
+Character 1: Yeah.
+Character 2: Human judgment is the essential bridge between that raw generated work and actual usable business value.
+Character 1: I agree that judgment matters, obviously, but the balance of power is fundamentally shifting here because that raw analytical power, what we call IQ, is now virtually free.
+Character 2: Right. It's abundant.
+Character 1: Exactly. It's scaling infinitely and becoming commoditized. When the barrier to entry for complex analysis drops to zero, those traditional institutional gatekeepers lose their primary advantage.
+Character 2: But that is exactly why emotional intelligence, EQ, holds the real leverage now. IQ used to dominate the billing, sure, but David Deming's research highlights that combining analytical and social skills is what actually moves the needle today.
+Character 1: Okay, but how does that play out in the actual day-to-day work?
+Character 2: Well, answers alone don't produce agreement. Cruz maps this out beautifully into twelve operating stages of work.
+Character 1: Right. With the early stages being what? Just data definition?
+Character 2: Exactly. An AI can define and check the work perfectly, which covers stages one through three.
+Character 1: Yeah. Makes sense.
+Character 2: But getting a skeptical VP of finance to actually trust that output, to deploy it into production, that takes you to stages ten through twelve, directing outcomes and orchestrating scale.
+Character 1: I see what you mean, yeah.
+Character 2: You absolutely need human empathy, trust, and inside relationships to navigate an organization like that, and AI just doesn't have that capability.
+Character 1: Well, for now. But let's look at where this is ultimately heading by, say, twenty thirty-one, this idea of the delegated economy.
+Character 2: Ah, the delegated economy.
+Character 1: Right. Picture a world where networks of AI agents negotiate budgets, sign contracts, and allocate work to each other at machine speed, completely bypassing human managers.
+Character 2: Which sounds terrifying to some people.
+Character 1: Maybe. But if machine speed delegation is inevitable, aren't internal employees just waiting to be reduced to a cost line in someone else's algorithmic model?
+Character 2: That's a fascinating prospect, but you're missing the primary danger of operating at that machine speed.
+Character 1: Which is?
+Character 2: As AI agents negotiate and allocate work instantly, corporate commitments will accumulate way faster than any executive can actually understand them.
+Character 1: Oh, wow. Yeah, that's a good point.
+Character 2: Right? You will desperately need inside experts, human conductors, basically, to challenge, audit, and stop those automated commitments before they bankrupt or derail the institution. The technology provides a powerful harness, but the harness doesn't decide if we're heading in the right direction.
+Character 1: So we are left with a pretty fundamental tension here between external agility and internal trust.
+Character 2: Exactly.
+Character 1: The outside wedge offers frictionless innovation, letting you build the future on your own terms.
+Character 2: While the inside wedge relies on established relationships and human judgment to guide that AI safely into the real world, ensuring it actually serves the business.
+Character 1: The one thing we know for certain is that human expertise must write these operating rules rather than just becoming a cost line in a model.
+Character 2: Absolutely.
+Character 1: But the ultimate question of who gets there first, the nimble speedboat bypassing the system from the outside or the inside professional who finally learned how to steer the cargo ship, that remains an open question for all of us to navigate.
