@@ -1,0 +1,28 @@
+# Site-wide settings for the audio hub. Edit rarely.
+site_name: mAInCharacter Audio
+tagline: "Thought leadership on career intelligence and the AI future of work."
+# Where the site is served. Keep the github.io address until the DNS record for the
+# custom domain exists, then switch site_url and set custom_domain (see UPDATING.md).
+site_url: https://beto-mc.github.io/Articles-LinkedIn-Career-Intelligence
+custom_domain: ""            # e.g. audio.main-character.me  (writes CNAME when set)
+language: en-US
+author: Beto Cruz
+publisher: mAInCharacter Advisory LLC
+publisher_url: https://main-character.me/
+contact_email: beto@main-character.me
+registry_url: https://main-character.me/intelligence.html#index   # the master registry lives here
+calendly: https://calendly.com/beto_mc/30-minute-meeting-discovery-briefing
+license_name: "CC BY-NC-ND 4.0"
+license_url: https://creativecommons.org/licenses/by-nc-nd/4.0/
+license_plain: "share unchanged, noncommercial, with attribution"
+rights_url: https://main-character.me/rights-and-use.html
+same_as:
+  - https://main-character.me/
+  - https://github.com/mAInCharacter-me
+# Official brand files, release-pinned (mc-brand-assets). PNG only for logos.
+brand_base: https://cdn.jsdelivr.net/gh/mAInCharacter-me/mc-brand-assets@v1.1.0
+# Download formats, in display order. WAV adds about 10 MB per minute of audio.
+formats: [mp3, m4a, wav]
+# AI crawler policy for robots.txt: search/answer bots are always allowed.
+# 'block' keeps model-training crawlers out; 'allow' lets them in.
+ai_training_crawlers: block
