@@ -71,13 +71,16 @@ def transcode(src, dst, fmt, tags):
 
 def read_transcript(path):
     lines = []
-    for raw in path.read_text(encoding="utf-8").splitlines():
+    text = path.read_text(encoding="utf-8")
+    # Zero-based tools (speaker_0 / SPEAKER_00) shift up by one; one-based labels stay as they are.
+    zero_based = re.search(r"^(?:Speaker|Character|SPEAKER)[ _]?0+\s*[:\-]", text, re.M | re.I) is not None
+    for raw in text.splitlines():
         raw = raw.strip()
         if not raw:
             continue
-        m = re.match(r"^(?:Speaker|Character|SPEAKER)[ _]?(\d+)\s*[:\-]\s*(.*)$", raw)
+        m = re.match(r"^(?:Speaker|Character)[ _]?(\d+)\s*[:\-]\s*(.*)$", raw, re.I)
         if m:
-            lines.append((f"Character {int(m.group(1)) + (1 if raw.upper().startswith('SPEAKER_') else 0)}", m.group(2)))
+            lines.append((f"Character {int(m.group(1)) + (1 if zero_based else 0)}", m.group(2)))
         elif lines:
             lines[-1] = (lines[-1][0], lines[-1][1] + " " + raw)
         else:
@@ -202,6 +205,9 @@ def build(args):
     if args.site_url:
         site["site_url"] = args.site_url
     site["site_url"] = site["site_url"].rstrip("/")
+    cd = (site.get("custom_domain") or "").strip()
+    if cd and site["site_url"] != f"https://{cd}" and not args.site_url:
+        sys.exit(f"site.yml: custom_domain is {cd} but site_url is {site['site_url']}. Set site_url: https://{cd} in the same commit.")
     brand = (args.brand_local or site["brand_base"]).rstrip("/")
     out = ROOT / args.out
     if out.exists():
@@ -226,7 +232,9 @@ def build(args):
             continue
         pub = yaml.safe_load(yml.read_text(encoding="utf-8"))
         pub["date"] = str(pub["date"])
-        if pub.get("status", "published") == "archived":
+        if pub.get("status") not in ("published", "draft", "archived"):
+            sys.exit(f"{yml.relative_to(ROOT)}: status must be published, draft or archived (got {pub.get('status')!r})")
+        if pub["status"] == "archived":
             continue
         pub["_dir"] = yml.parent
         missing = [k for k in ("slug", "date", "title", "description", "badge", "audio") if not pub.get(k)]
@@ -252,6 +260,12 @@ def build(args):
         slug, pdir = pub["slug"], out / pub["slug"]
         url = f"{site['site_url']}/{slug}/"
         draft = pub.get("status") == "draft"
+        expected = {f"mC_{slug}_{a['id']}.{fmt}" for a in pub["audio"] for fmt in site["formats"]}
+        if (pdir / "audio").exists():
+            for f in (pdir / "audio").iterdir():
+                if f.name not in expected:
+                    f.unlink()   # removed format, renamed or deleted episode
+        shutil.rmtree(pdir / "transcripts", ignore_errors=True)
         (pdir / "transcripts").mkdir(parents=True, exist_ok=True)
         for a in pub["audio"]:
             src = ROOT / a["master"]
@@ -298,6 +312,11 @@ def build(args):
     if site.get("custom_domain"):
         (out / "CNAME").write_text(site["custom_domain"].strip() + "\n")
     (out / ".nojekyll").write_text("")
+    total = sum(f.stat().st_size for f in out.rglob("*") if f.is_file())
+    budget = int(site.get("size_budget_mb", 750)) * 1_000_000
+    print(f"Site size: {total/1e6:.0f} MB of {budget/1e6:.0f} MB budget")
+    if total > budget:
+        sys.exit("Site is over its size budget. Remove wav from formats in site.yml, or archive old publications.")
     print(f"Built {len(pubs)} publication(s), {sum(len(p['audio']) for p in pubs)} audio item(s) -> {out}")
 
 
