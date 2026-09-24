@@ -31,6 +31,19 @@ For Beto and the mC team. Not published on the site.
 | A transcript `.txt` | On-page transcript plus branded `.md` and `.txt` downloads |
 | Any of the above | The audio registry page, `registry.json`, `feed.xml` (podcast RSS), `sitemap.xml`, `llms.txt`, search and AI metadata |
 
+## The claim check (TypeSafe Jev)
+
+Every build checks the page against its sources and writes a table to the run's summary (Actions tab → the run → Summary).
+
+| Check | How | Verdict |
+|---|---|---|
+| Key Quotes | Matched word for word in the transcript | verified / not in audio |
+| Summaries, Listen for | Jev judges each sentence against the transcript | verified / contradicted / unsupported |
+| Short answers | Jev judges each answer against the article section in its `source` link | same, or source missing if the link is dead |
+
+Below 0.8 confidence a verdict is marked "needs a person". The check never blocks publishing.
+Jev turns on when the repo has the secret `TYPESAFE_API_KEY` (Settings → Secrets and variables → Actions). Without it, only the quote match runs.
+
 ## Status and archive
 
 | Want to… | Do this |
