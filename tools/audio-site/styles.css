@@ -303,17 +303,33 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:var(--rhythm) 0
 .t-reveal{scroll-margin-top:84px}
 
 /* ---------- Round 2: hero art, pill mark + speed, episode grid, downloads, quotes, copy, consent ---------- */
-.hero.has-art{padding-right:46px}
-.hero-art{position:absolute;top:6px;right:6px;width:min(290px,31%);aspect-ratio:1;margin:0;pointer-events:none}
-.hero-art img{width:100%;height:100%;object-fit:contain;display:block}
-.hero-arc iframe{display:block;width:100%;height:100%;border:0;background:transparent;color-scheme:normal;pointer-events:none}
+.hero-text{position:relative;z-index:1}
+.hero-art{position:absolute;margin:0;pointer-events:none;z-index:0}
+/* a publication image: top-right, the text keeps clear of it */
+.hero-img{top:18px;right:22px;width:min(250px,27%);aspect-ratio:1}
+.hero-img img{width:100%;height:100%;object-fit:contain;display:block}
 .hero.has-art .hero-text{padding-right:min(250px,28%)}
 .hero.has-art .hero-text .ao-wrap{margin-right:calc(-1 * min(250px,28%))}
-@media(max-width:760px){.hero-art{top:-4px;right:-10px;width:156px}.hero.has-art .hero-text{padding-right:0}.hero.has-art .hero-text .ao-wrap{margin-right:0}.hero.has-art{padding-right:22px}.hero.has-art .hero-logo{min-height:44px}}
+/* the Arc Box: large, behind the title and deck */
+.hero-arc{top:-10px;right:-60px;width:min(600px,66%);aspect-ratio:1}
+.hero-arc iframe{display:block;width:100%;height:100%;border:0;background:transparent;color-scheme:normal;pointer-events:none}
+.hero.has-arc h1,.hero.has-arc .deck{text-shadow:0 1px 14px rgba(18,17,16,.85),0 0 2px rgba(18,17,16,.6)}
+@media(max-width:760px){.hero-img{top:6px;right:0;width:124px}.hero.has-art .hero-text{padding-right:0}.hero.has-art .hero-text .ao-wrap{margin-right:0}.hero.has-art .hero-logo{min-height:44px}}
+@media(max-width:640px){.hero-arc{display:none}}   /* phones: no Arc Box, a simpler title card */
 
 .ao{display:flex;width:100%;padding:7px 12px 7px 7px}
 .ao-meta{flex:0 1 auto;min-width:0}.ao-k{overflow:hidden;text-overflow:ellipsis}
 .ao-seek{flex:1 1 auto;width:auto;min-width:80px}
+/* the timing tracker: one look on every pill and browser (gold thumb on a dark rounded track) */
+.ao-seek{-webkit-appearance:none;appearance:none;height:24px;margin:0;padding:0;background:transparent;cursor:pointer}
+.ao-seek:focus{outline:none}
+.ao-seek:focus-visible{outline:2px solid #E7C877;outline-offset:2px;border-radius:999px}
+.ao-seek::-webkit-slider-runnable-track{height:8px;border-radius:999px;background:#2B2926;border:1px solid rgba(250,248,243,.24);box-shadow:inset 0 1px 2px rgba(0,0,0,.55)}
+.ao-seek::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;margin-top:-6px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#F3DA92,#E6C46C 55%,#CFAA4E);border:1px solid #8E6F24;box-shadow:0 1px 4px rgba(0,0,0,.55);transition:transform .15s}
+.ao-seek:hover::-webkit-slider-thumb,.ao-seek:active::-webkit-slider-thumb{transform:scale(1.08)}
+.ao-seek::-moz-range-track{height:8px;border-radius:999px;background:#2B2926;border:1px solid rgba(250,248,243,.24);box-shadow:inset 0 1px 2px rgba(0,0,0,.55)}
+.ao-seek::-moz-range-progress{background:transparent}
+.ao-seek::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#F3DA92,#E6C46C 55%,#CFAA4E);border:1px solid #8E6F24;box-shadow:0 1px 4px rgba(0,0,0,.55)}
 /* speed dial — mC Dials stepper on the dark capsule */
 .ao-dial{flex:0 0 auto;display:flex;align-items:stretch;height:40px;border:1px solid rgba(212,174,80,.45);border-radius:999px;background:rgba(0,0,0,.28);overflow:hidden;transition:border-color .2s,box-shadow .2s}
 .ao-dial:focus-within{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,174,80,.16)}
