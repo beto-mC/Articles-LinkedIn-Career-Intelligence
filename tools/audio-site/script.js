@@ -84,7 +84,6 @@
         if (RATES.indexOf(audio.playbackRate) > -1) setRate(audio.playbackRate, false);
       });
     }
-    audio.addEventListener('play', function () { window.mcTrack && window.mcTrack('audio_play', { title: ao.getAttribute('data-title') }); }, { once: true });
     seek.addEventListener('input', function () {
       audio.currentTime = parseFloat(seek.value) || 0;
       timeCur.textContent = fmt(audio.currentTime);
@@ -171,7 +170,7 @@
   if (mq.addEventListener) mq.addEventListener('change', load); else if (mq.addListener) mq.addListener(load);
 })();
 
-/* Analytics (consent-gated), downloads, transcript copy, first-visit sonic log */
+/* Analytics (consent-gated), transcript copy, first-visit sonic log */
 (function () {
   var ga = document.body.getAttribute('data-ga');
   var consentKey = 'mc-analytics';
@@ -199,10 +198,7 @@
       if (b.getAttribute('data-consent') === 'yes') loadGA();
     });
   }
-  document.addEventListener('click', function (ev) {
-    var a = ev.target.closest('[data-track]');
-    if (a) window.mcTrack(a.getAttribute('data-track'), { title: a.getAttribute('data-title'), format: a.getAttribute('data-format') });
-  });
+  /* plays, progress, completions and downloads: audio-ga.js (one schema shared with main-character.me) */
 
   /* copy a whole container (transcript) with the attribution line */
   document.querySelectorAll('.t-copy').forEach(function (btn) {
@@ -211,7 +207,7 @@
       var lines = Array.prototype.map.call(body.querySelectorAll('p'), function (p) { return p.innerText.replace(/\s+/g, ' ').trim(); });
       var lic = document.querySelector('.license') ? document.querySelector('.license').innerText.replace(/\s+/g, ' ').trim() : '';
       var text = btn.getAttribute('data-title') + ' — transcript\n\n' + lines.join('\n\n') + '\n\n' + lic + '\n' + location.href;
-      var done = function () { var old = btn.textContent; btn.textContent = 'Copied'; btn.classList.add('is-done'); setTimeout(function () { btn.textContent = old; btn.classList.remove('is-done'); }, 1600); window.mcTrack('transcript_copy', { title: btn.getAttribute('data-title') }); };
+      var done = function () { var old = btn.textContent; btn.textContent = 'Copied'; btn.classList.add('is-done'); setTimeout(function () { btn.textContent = old; btn.classList.remove('is-done'); }, 1600); if (window.mcAudioGA) window.mcAudioGA.track('transcript_copy', btn.getAttribute('data-audio-ref')); };
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, function () { fallback(text); done(); });
       else { fallback(text); done(); }
       function fallback(t) { var ta = document.createElement('textarea'); ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch (e) {} ta.remove(); }
@@ -245,7 +241,7 @@
         off();
         var t = ev.target && ev.target.closest ? ev.target : null;
         if (t && t.closest('.sonic-cue')) return;
-        if (t && t.closest('.ao, audio, [data-track="download"]')) { store('mc-sonic-played', '1'); return; }
+        if (t && t.closest('.ao, audio, [data-audio-download]')) { store('mc-sonic-played', '1'); return; }
         go();
       };
       document.addEventListener('pointerdown', first, true); document.addEventListener('keydown', first, true);

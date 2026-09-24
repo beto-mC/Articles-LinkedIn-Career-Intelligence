@@ -235,10 +235,18 @@ RATES = [0.75, 1, 1.25, 1.5, 1.75, 2, 2.25]
 RATE_TICKS = "".join(f'<i data-r="{r}"></i>' for r in RATES)
 
 
-def player(a, src_rel, label="Listen", brand="", home="https://main-character.me/", mark=False):
+def audio_ga_attrs(slug, a):
+    """The episode's analytics identity (audio-ga.js). The article page on main-character.me must carry
+    the same values for the same episode, so one episode reports the same way wherever it plays."""
+    return (f'data-audio-id="{e(slug)}/{e(a["id"])}" data-audio-title="{e(a["title"])}" '
+            f'data-audio-file="mC_{e(slug)}_{e(a["id"])}.mp3" data-audio-kind="{e(a.get("kind", ""))}" '
+            f'data-audio-duration="{int(round(a["_dur"]))}" data-publication="{e(slug)}" data-surface="audio_site"')
+
+
+def player(a, src_rel, label="Listen", brand="", home="https://main-character.me/", mark=False, slug=""):
     """The audio pill. mark=True adds the gold mC icon (title card only; episode pills stay clean)."""
     mark_html = (f'\n  <a class="ao-mark" href="{e(home)}" aria-label="mAInCharacter — main-character.me"><img src="{brand}/icon/png/mc-icon-stacked-gold-transparent-2048.png" width="2048" height="2048" alt="" loading="lazy"></a>') if mark else ""
-    return f"""<div class="ao-wrap"><div class="ao" role="group" aria-label="Audio: {e(a['title'])}" data-title="{e(a['title'])}">
+    return f"""<div class="ao-wrap"><div class="ao" role="group" aria-label="Audio: {e(a['title'])}" data-title="{e(a['title'])}" {audio_ga_attrs(slug, a)}>
   <button type="button" class="ao-play" aria-pressed="false" aria-label="Play {e(a['title'])}"><svg class="ao-i-play" viewBox="0 0 24 24" aria-hidden="true"><polygon points="7 4 20 12 7 20 7 4"/></svg><svg class="ao-i-pause" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="4" width="4.5" height="16" rx="1"/><rect x="13.5" y="4" width="4.5" height="16" rx="1"/></svg></button>
   <span class="ao-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
   <span class="ao-meta"><span class="ao-k">{e(label)}</span><span class="ao-t"><span class="ao-time-current">0:00</span><span class="ao-sep">/</span><span class="ao-time-duration">{clock(a['_dur'])}</span></span></span>
@@ -287,7 +295,7 @@ def build(args):
                 p.unlink()
     out.mkdir(parents=True, exist_ok=True)
     (out / "assets").mkdir(exist_ok=True)
-    for f in ("styles.css", "script.js"):
+    for f in ("styles.css", "script.js", "audio-ga.js"):
         shutil.copy(HERE / f, out / "assets" / f)
     sref = site.get("sonic_log")
     if sref and not re.match(r"^https?://", sref) and not (ROOT / sref).exists():
@@ -472,7 +480,7 @@ def render_publication(site, brand, pub, pdir, url, draft):
     <h1>{title_html(pub)}</h1>
     <p class="deck">{e(pub.get('deck'))}</p>
     {f'<p class="deck define">{md_inline(pub["define"])}</p>' if pub.get('define') else ''}
-    {player(first, first['_files']['mp3'][0], 'Listen · ' + first.get('generator_format', ''), brand, site['publisher_url'], mark=True)}
+    {player(first, first['_files']['mp3'][0], 'Listen · ' + first.get('generator_format', ''), brand, site['publisher_url'], mark=True, slug=pub['slug'])}
     <div class="byline"><span>By<strong>{e(site['author'])} · {BRAND}</strong></span><span>Published<strong><time datetime="{e(pub['date'])}">{dt.date.fromisoformat(pub['date']).strftime('%B %-d, %Y')}</time></strong></span><span>Form<strong>Audio · {len(pub['audio'])} episode{'s' if len(pub['audio']) != 1 else ''}</strong></span></div>
     {f'<a class="back" href="{e(pub["canonical_article"])}">Read the full article →</a>' if pub.get('canonical_article') else ''}
   </div>
@@ -492,9 +500,9 @@ def render_publication(site, brand, pub, pdir, url, draft):
 </section>""")
     for a in pub["audio"]:
         n += 1
-        dls = "".join(f'<a class="dl" href="{e(rel)}" download data-track="download" data-format="{k}" data-title="{e(a["title"])}"><span class="dl-badge">{ICON_FILE}<b>{FMT[k]["label"]}</b></span><span class="dl-size">{mb(size)}</span><span class="sr">{FMT[k]["note"]}</span></a>'
+        dls = "".join(f'<a class="dl" href="{e(rel)}" download data-audio-download="{k}" data-audio-ref="{e(pub["slug"])}/{e(a["id"])}"><span class="dl-badge">{ICON_FILE}<b>{FMT[k]["label"]}</b></span><span class="dl-size">{mb(size)}</span><span class="sr">{FMT[k]["note"]}</span></a>'
                       for k, (rel, size) in a["_files"].items())
-        tdl = "".join(f'<a class="dl dl--doc" href="{e(rel)}" download data-track="transcript_download" data-format="{k}" data-title="{e(a["title"])}"><span class="dl-badge">{ICON_DOC}<b>{k.upper()}</b></span><span class="dl-size">{"Markdown" if k == "md" else "Plain text"}</span></a>'
+        tdl = "".join(f'<a class="dl dl--doc" href="{e(rel)}" download data-audio-transcript="{k}" data-audio-ref="{e(pub["slug"])}/{e(a["id"])}"><span class="dl-badge">{ICON_DOC}<b>{k.upper()}</b></span><span class="dl-size">{"Markdown" if k == "md" else "Plain text"}</span></a>'
                       for k, rel in a.get("_tfiles", {}).items())
         quotes = "".join(f'<li><span class="q-mark" aria-hidden="true">“</span>{e(q)}</li>' for q in (a.get("quotes") or [])[:3])
         refs = "".join(f'<li><a href="{e(r["url"])}">{e(r["label"])}</a></li>' for r in a.get("references", []))
@@ -505,7 +513,7 @@ def render_publication(site, brand, pub, pdir, url, draft):
   <p class="summary-p">{e(a['summary'])}</p>
   <div class="ep-grid">
     <div class="ep-main">
-      {player(a, a['_files']['mp3'][0], 'Listen', brand, site['publisher_url'])}
+      {player(a, a['_files']['mp3'][0], 'Listen', brand, site['publisher_url'], slug=pub['slug'])}
       {f'<p class="listen-for"><span>Listen for</span>{e(a["listen_for"])}</p>' if a.get('listen_for') else ''}
       {f'<div class="quotes"><p class="eyebrow">Key quotes</p><ul>{quotes}</ul></div>' if quotes else ''}
     </div>
@@ -515,7 +523,7 @@ def render_publication(site, brand, pub, pdir, url, draft):
       <dl class="ep-meta"><div><dt>Made with</dt><dd>{e(a['generator'])}</dd></div><div><dt>Voices</dt><dd>{a.get('voices', '')} AI</dd></div></dl>
     </aside>
   </div>
-  {f'<div class="t-reveal" data-reveal="transcript"><div class="t-head-row"><button type="button" class="t-head" aria-expanded="false" aria-controls="t-{e(a["id"])}"><span class="t-label">Transcript</span><span class="t-sub">{tnote}</span><span class="dn-cue" aria-hidden="true">+</span><span class="t-cue-l">Full transcript</span></button><button type="button" class="t-copy" data-copy="t-{e(a["id"])}" data-title="{e(a["title"])}" aria-label="Copy the full transcript">Copy</button></div><div class="t-body" id="t-{e(a["id"])}">{lines}</div></div>' if lines else ''}
+  {f'<div class="t-reveal" data-reveal="transcript"><div class="t-head-row"><button type="button" class="t-head" aria-expanded="false" aria-controls="t-{e(a["id"])}"><span class="t-label">Transcript</span><span class="t-sub">{tnote}</span><span class="dn-cue" aria-hidden="true">+</span><span class="t-cue-l">Full transcript</span></button><button type="button" class="t-copy" data-copy="t-{e(a["id"])}" data-title="{e(a["title"])}" data-audio-ref="{e(pub["slug"])}/{e(a["id"])}" aria-label="Copy the full transcript">Copy</button></div><div class="t-body" id="t-{e(a["id"])}">{lines}</div></div>' if lines else ''}
   {f'<div class="refs"><p class="eyebrow">References</p><ul>{refs}</ul></div>' if refs else ''}
   <p class="attrib">AI-generated audio: {e(a['generator'])}, {e(a.get('generator_format'))} format. Voices are synthetic and may contain errors. Written summary, title and notes by {BRAND}.</p>
 </section>""")
@@ -528,7 +536,7 @@ def render_publication(site, brand, pub, pdir, url, draft):
     parts.append(closing(site))
     parts.append(f'<div class="colophon">{e(site["author"])} · {BRAND} · {e(pub.get("series") or "")} · {dt.date.fromisoformat(pub["date"]).strftime("%B %Y")}{license_block(site)}</div></main>')
     parts.append(footer(site, brand, [("All audio", "../"), ("Master registry", site["registry_url"]), ("Book a Briefing", site["calendly"])]))
-    parts.append('<script src="../assets/script.js"></script>\n</body>\n</html>')
+    parts.append('<script src="../assets/audio-ga.js"></script>\n<script src="../assets/script.js"></script>\n</body>\n</html>')
     (pdir / "index.html").write_text("\n".join(parts), encoding="utf-8")
 
 
