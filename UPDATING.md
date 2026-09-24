@@ -56,6 +56,43 @@ Jev turns on when the repo has the secret `TYPESAFE_API_KEY` (Settings → Secre
 
 The title-card pill carries the gold mC icon, linked to main-character.me. Episode pills leave it off. Every pill has a speed dial (75% to 225%, in 25% steps); the choice is remembered for the visitor. Narrow pills move the seek bar to a second row.
 
+## Listening analytics (one schema everywhere)
+
+`tools/audio-site/audio-ga.js` is the one tracker for every mAInCharacter audio player: this site and the
+article pages on main-character.me. The same episode reports the same way wherever it plays, so Google
+Analytics can add the plays up by episode and still tell the pages apart.
+
+| Event | When | Extra parameter |
+|---|---|---|
+| `audio_play` | first play of an episode in a page view | — |
+| `audio_progress` | 25, 50 and 75 percent listened | `audio_percent` |
+| `audio_complete` | played to the end | `audio_percent` = 100 |
+| `audio_download` | each MP3, M4A or WAV download | `audio_format` |
+| `transcript_download` / `transcript_copy` | each transcript download or copy | `audio_format` (download) |
+
+Every event carries the same seven parameters for the same episode:
+
+| Parameter | Example |
+|---|---|
+| `audio_id` | `2026-09-21-ai-quotient/speedboats-vs-cargo-ships` (also the episode's RSS guid) |
+| `audio_title` | the episode `title` from audio.yml, the same title tagged inside the MP3 |
+| `audio_file` | `mC_2026-09-21-ai-quotient_speedboats-vs-cargo-ships.mp3` |
+| `audio_kind` | `Debate · two hosts` |
+| `audio_duration` | `332` (seconds) |
+| `publication` | `2026-09-21-ai-quotient` |
+| `surface` | `audio_site` here, `article` on main-character.me |
+
+The build writes these values onto every player for you. To track an episode on another page, put the same
+`data-audio-*` values on the element around its `<audio>` and paste in a copy of `audio-ga.js`. When you change
+`audio-ga.js`, change every copy; each starts with `mc-audio-ga v<number>`, so a search shows which version a page has.
+
+On this site nothing is sent until a visitor presses "Count me". main-character.me loads Google Analytics without
+a consent bar, so the article page counts every visitor and this site counts only those who agree.
+
+One-time, in Google Analytics (Admin → Data display → Custom definitions → Create custom dimension, scope Event):
+`audio_id`, `audio_title`, `audio_kind`, `surface`, `publication`, `audio_format`, and `audio_percent`. Reports
+show these from the day they are created, not before.
+
 ## Where the master registry lives
 
 The master table of contents for all mAInCharacter publications stays on
@@ -68,7 +105,7 @@ and needs Tom's sign-off.
 
 | Key | What it does |
 |---|---|
-| `ga_measurement_id` | GA4 ID (`G-…`). Set to the mC Web stream, `G-80FW775JMB`. Empty = no analytics at all. When set, a consent bar appears; Google Analytics loads only after "Count me", and records plays, downloads and transcript copies. |
+| `ga_measurement_id` | GA4 ID (`G-…`). Set to the mC Web stream, `G-80FW775JMB`. Empty = no analytics at all. When set, a consent bar appears; Google Analytics loads only after "Count me", and records plays, progress, completions, downloads and transcript copies (see Listening analytics). |
 | `sonic_log` / `sonic_source` | The sonic logo. The workflow renders `sonic_log` (an MP3) on each build from the *mC Sonic Constellation* export named in `sonic_source` (`assets/mC_Sonic_Constellation_standalone.html`), using its own audio engine. To change the sound, replace that export with a new one of the same name. Commit an MP3 at the `sonic_log` path to override. On the page it is a small gold dot, bottom left: hover shows the arcs and waveform, pressing plays it, pressing again stops it. An episode starting silences it. |
 | `sonic_autoplay` | `false` (default) = the sonic logo plays only when pressed. `true` = it also plays once on a visitor's first tap or click, unless that tap is on an audio player. |
 | `arcbox` | The *mC Arc Box* export (`assets/mC_Arc_Box_-_Embed_standalone.html`). The build unpacks it and shows it top-right on every title card. To change it, replace that export with a new one of the same name. A publication can set `hero_art` to show an image instead, or `arcbox: false` to hide it. |

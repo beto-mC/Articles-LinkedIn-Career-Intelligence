@@ -29,7 +29,8 @@ size_budget_mb: 750          # the build fails above this (GitHub Pages sites sh
 ai_training_crawlers: block
 # Google Analytics 4 measurement ID (G-XXXXXXXXXX). Empty = no analytics at all.
 # When set, GA loads only after a visitor accepts the consent bar; it records plays,
-# downloads and transcript copies, nothing else. See UPDATING.md.
+# progress, completions, downloads and transcript copies, nothing else. See UPDATING.md
+# (Listening analytics): the same events and parameters as the article pages on main-character.me.
 ga_measurement_id: "G-80FW775JMB"   # mC Web stream (15086425448). Empty = no analytics.
 # The sonic logo: a small gold dot, bottom left. Hover shows the waves; pressing plays it.
 # Repo path or URL. Empty = off.
