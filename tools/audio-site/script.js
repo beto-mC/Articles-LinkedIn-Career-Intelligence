@@ -161,6 +161,16 @@
 })();
 
 
+/* The Arc Box loads on tablets and desktops only; phones keep the title card simple */
+(function () {
+  var f = document.querySelector('.hero-arc iframe[data-src]');
+  if (!f || !window.matchMedia) return;
+  var mq = window.matchMedia('(min-width: 641px)');
+  function load() { if (mq.matches && !f.getAttribute('src')) f.setAttribute('src', f.getAttribute('data-src')); }
+  load();
+  if (mq.addEventListener) mq.addEventListener('change', load); else if (mq.addListener) mq.addListener(load);
+})();
+
 /* Analytics (consent-gated), downloads, transcript copy, first-visit sonic log */
 (function () {
   var ga = document.body.getAttribute('data-ga');
