@@ -443,26 +443,27 @@ def title_html(pub):
 
 
 def hero_art(site, pub):
-    """Top-right of the title card: a publication image if set, else the site's Arc Box."""
+    """Title card art: a publication image (top-right, beside the text) if set, else the
+    site's Arc Box (large, behind the text). Returns (html, hero class)."""
     if pub.get("_hero_art"):
-        return (f'<figure class="hero-art"><img src="{e(pub["_hero_art"])}" alt="{e(pub.get("hero_art_alt") or "")}" '
-                'loading="eager" decoding="async"></figure>')
+        return (f'<figure class="hero-art hero-img"><img src="{e(pub["_hero_art"])}" alt="{e(pub.get("hero_art_alt") or "")}" '
+                'loading="eager" decoding="async"></figure>', "has-art")
     if site.get("_arcbox") and pub.get("arcbox", True) is not False:
-        return ('<div class="hero-art hero-arc" aria-hidden="true"><iframe src="../assets/arcbox/index.html" '
-                'title="mAInCharacter Arc Box" tabindex="-1" loading="lazy"></iframe></div>')
-    return ""
+        return ('<div class="hero-art hero-arc" aria-hidden="true"><iframe data-src="../assets/arcbox/index.html" '
+                'title="mAInCharacter Arc Box" tabindex="-1" loading="lazy"></iframe></div>', "has-arc")
+    return "", ""
 
 
 def render_publication(site, brand, pub, pdir, url, draft):
     first = pub["audio"][0]
-    art = hero_art(site, pub)
+    art, art_cls = hero_art(site, pub)
     th = pub.get("thesis") or {}
     nav = ([("Thesis", "#thesis")] if th else []) + [(a.get("nav") or a.get("generator_format") or a["title"], f"#{a['id']}") for a in pub["audio"]] + [("All audio", "../")]
     parts = [head_block(site, f"{pub['title']} — {site['site_name']} | mAInCharacter", pub["description"], url,
                         f"{brand}/favicon/og-image-1200x630.png", brand, jsonld_publication(site, brand, pub, url), draft,
                         "../assets/styles.css", pub.get("keywords", []), site["_sonic_sub"]),
              site_head(site, brand, "../", nav), '<main class="wrap" id="main">',
-             f"""<div class="hero{' has-art' if art else ''}">
+             f"""<div class="hero{(' ' + art_cls) if art_cls else ''}">
   {art}
   <div class="hero-text">
     <div class="hero-logo"><a href="{e(site['publisher_url'])}" aria-label="mAInCharacter home">{logo(brand, 'dark', 'mc-lockup')}</a></div>
