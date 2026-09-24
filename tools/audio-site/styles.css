@@ -117,7 +117,7 @@ strong{font-weight:600}
 .ao-sep{margin:0 4px;opacity:.5}
 .ao-seek{width:120px;accent-color:#E7C877;height:22px;background:transparent;cursor:pointer;flex:0 0 auto}
 .ao.is-missing .ao-seek,.ao.is-missing .ao-wave{opacity:.35}
-@media(max-width:640px){.ao-seek{display:none}}
+
 
 /* ---------- sections ---------- */
 .section-header{display:flex;align-items:center;gap:16px;margin:var(--rhythm) 0 18px;scroll-margin-top:72px}
@@ -301,3 +301,105 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:var(--rhythm) 0
 @media(prefers-reduced-motion:reduce){.t-body,.t-head .dn-cue{transition:none}}
 @media print{.t-body{max-height:none!important;overflow:visible!important}.t-body::after,.t-cue-l,.t-head .dn-cue{display:none!important}}
 .t-reveal{scroll-margin-top:84px}
+
+/* ---------- Round 2: hero art, pill mark + speed, episode grid, downloads, quotes, copy, consent ---------- */
+.hero.has-art{padding-right:46px}
+.hero-art{position:absolute;top:6px;right:6px;width:min(290px,31%);aspect-ratio:1;margin:0;pointer-events:none}
+.hero-art img{width:100%;height:100%;object-fit:contain;display:block}
+.hero-arc iframe{display:block;width:100%;height:100%;border:0;background:transparent;color-scheme:normal;pointer-events:none}
+.hero.has-art .hero-text{padding-right:min(250px,28%)}
+.hero.has-art .hero-text .ao-wrap{margin-right:calc(-1 * min(250px,28%))}
+@media(max-width:760px){.hero-art{top:-4px;right:-10px;width:156px}.hero.has-art .hero-text{padding-right:0}.hero.has-art .hero-text .ao-wrap{margin-right:0}.hero.has-art{padding-right:22px}.hero.has-art .hero-logo{min-height:44px}}
+
+.ao{display:flex;width:100%;padding:7px 12px 7px 7px}
+.ao-meta{flex:0 1 auto;min-width:0}.ao-k{overflow:hidden;text-overflow:ellipsis}
+.ao-seek{flex:1 1 auto;width:auto;min-width:80px}
+/* speed dial — mC Dials stepper on the dark capsule */
+.ao-dial{flex:0 0 auto;display:flex;align-items:stretch;height:40px;border:1px solid rgba(212,174,80,.45);border-radius:999px;background:rgba(0,0,0,.28);overflow:hidden;transition:border-color .2s,box-shadow .2s}
+.ao-dial:focus-within{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,174,80,.16)}
+.ao-step{appearance:none;flex:0 0 auto;width:38px;border:0;background:transparent;color:#E7C877;font-family:var(--font-mono);font-size:18px;font-weight:300;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .18s,color .18s}
+.ao-step:hover{background:rgba(231,200,119,.16);color:#FAF8F3}
+.ao-step:active{background:var(--gold);color:var(--charcoal)}
+.ao-step:focus-visible{outline:2px solid #E7C877;outline-offset:-3px}
+.ao-step:disabled{opacity:.3;cursor:default;background:transparent;color:#E7C877}
+.ao-dial-box{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:58px;padding:0 2px;border-left:1px solid rgba(212,174,80,.22);border-right:1px solid rgba(212,174,80,.22)}
+.ao-rate-v{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.02em;color:#FAF8F3;line-height:1}
+.ao-ticks{display:flex;gap:2px}
+.ao-ticks i{display:block;width:5px;height:3px;border-radius:1px;background:rgba(231,200,119,.22);cursor:pointer;transition:background .2s}
+.ao-ticks i.on{background:#E7C877}
+/* the pill mark — gold stacked icon only, no ring; title-card pill only */
+.ao-mark{flex:0 0 auto;display:grid;place-items:center;width:40px;height:40px;border:0;background:none;padding:0;line-height:0}
+.ao-mark img{width:40px;height:40px;display:block;opacity:.92;transition:opacity .2s}
+.ao-mark:hover img,.ao-mark:focus-visible img{opacity:1}
+/* the pill sizes to its own width, not the window: narrow pills put the seek bar on a second row */
+.ao-wrap{container:ao / inline-size}
+@container ao (max-width:600px){.ao-wave{display:none}.ao-seek{min-width:56px}}
+@container ao (max-width:470px){.ao{flex-wrap:wrap;gap:8px 9px;padding:7px 10px 9px 7px;border-radius:30px}.ao-meta{flex:1 1 0}.ao-seek{order:9;flex:1 1 100%;margin:0 4px}}
+@container ao (max-width:360px){.ao{gap:8px 6px;padding:6px 8px 9px 6px}.ao-play{width:40px;height:40px}.ao-meta{flex:1 0 74px}.ao-k{letter-spacing:.12em}.ao-dial{height:36px}.ao-step{width:28px;font-size:16px}.ao-dial-box{min-width:46px}.ao-rate-v{font-size:11.5px}.ao-ticks i{width:4px}.ao-mark,.ao-mark img{width:34px;height:34px}}
+
+.summary-p{font-size:15.5px;line-height:1.75;max-width:70ch;margin:0 0 20px}
+.ep-grid{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:22px 32px;align-items:start}
+.ep-main{min-width:0}
+.ep-main .ao{margin:0 0 18px}
+.ep-main .listen-for{margin:0 0 18px;padding:12px 16px;background:#fff;border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;font-size:14.5px}
+.ep-main .listen-for span{display:block;font-family:var(--font-mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-text);margin-bottom:3px}
+.quotes .eyebrow{display:block;margin-bottom:8px}
+.quotes ul{list-style:none;display:grid;gap:10px}
+.quotes li{position:relative;font-family:var(--font-display);font-style:italic;font-size:19px;line-height:1.35;color:var(--charcoal);padding:10px 16px 10px 34px;background:var(--cream);border-radius:0 8px 8px 0;border-left:3px solid var(--gold-deep)}
+.quotes .q-mark{position:absolute;left:11px;top:4px;font-size:30px;line-height:1;color:var(--gold);font-style:normal}
+.ep-side{background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px 16px 12px;box-shadow:var(--shadow-card);position:sticky;top:84px}
+.ep-side .eyebrow{display:block;margin:0 0 8px}
+.ep-side .eyebrow+.dl-list+.eyebrow{margin-top:16px}
+.dl-list{display:grid;gap:6px}
+.dl{display:flex;align-items:center;gap:12px;padding:6px 10px 6px 6px;border:1px solid var(--border);border-radius:8px;background:var(--bone);min-height:48px;transition:border-color .2s,background .2s;color:var(--charcoal)}
+.dl:hover,.dl:focus-visible{border-color:var(--gold);background:#fff;color:var(--charcoal)}
+.dl-badge{width:36px;height:36px;border-radius:7px}
+.dl-badge b{font-size:8px}
+.dl-i{width:14px;height:14px}
+.dl-size{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;color:var(--ink-2);margin-left:auto}
+.ep-side .ep-meta{grid-template-columns:1fr;gap:6px;margin:16px 0 0;padding:12px 0 0;border-bottom:0}
+.ep-side .ep-meta dd{font-size:15px}
+@media(max-width:900px){.ep-grid{grid-template-columns:1fr}.ep-side{position:static}.dl-list{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}}
+
+.t-head-row{display:flex;align-items:stretch;border-bottom:1px solid var(--rule)}
+.t-head-row .t-head{border-bottom:0;flex:1}
+.t-copy{appearance:none;flex:0 0 auto;min-width:64px;border:0;border-left:1px solid var(--rule);background:var(--bone);font-family:var(--font-mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--gold-text);cursor:pointer;padding:0 14px;transition:background .2s,color .2s}
+.t-copy:hover,.t-copy:focus-visible{background:var(--gold);color:var(--charcoal)}
+.t-copy.is-done{background:var(--charcoal);color:var(--gold)}
+.qa-src{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-text);border-bottom:1px solid var(--gold-deep);margin-left:8px;white-space:nowrap}
+
+.consent{position:fixed;left:16px;right:16px;bottom:16px;z-index:130;max-width:560px;margin:0 auto;background:var(--charcoal);color:var(--cream);border:1px solid var(--gold);border-radius:12px;padding:16px 18px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px 18px;align-items:center;box-shadow:0 20px 50px -20px rgba(0,0,0,.6)}
+.consent[hidden]{display:none}
+.consent p{font-size:13.5px;line-height:1.55;margin:0}
+.consent a{color:var(--gold);border-color:rgba(212,174,80,.5)}
+.consent-btns{display:flex;gap:8px}
+.consent .btn{min-height:40px;padding:8px 14px}
+.consent .btn.ghost{color:var(--gold);border-color:var(--gold-deep)}
+@media(max-width:560px){.consent{grid-template-columns:1fr}}
+/* sonic logo: the North Star dot at rest; hover, focus or play opens the arcs and the waveform */
+.sonic-cue{position:fixed;left:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:116;appearance:none;width:40px;height:40px;padding:0;border:1px solid rgba(212,174,80,.5);border-radius:999px;background:#121110;overflow:hidden;cursor:pointer;box-shadow:0 8px 22px -10px rgba(0,0,0,.6);transition:width .35s cubic-bezier(.2,.7,.2,1),border-color .2s,bottom .3s}
+.sonic-cue svg{position:absolute;top:-1px;left:-27px;width:150px;height:40px;overflow:visible;transition:left .35s cubic-bezier(.2,.7,.2,1)}
+.sonic-cue.is-raised{bottom:calc(180px + env(safe-area-inset-bottom,0px))}
+@media(min-width:760px){.sonic-cue.is-raised{bottom:calc(16px + env(safe-area-inset-bottom,0px))}}
+.sc-dot{fill:#E7C877;filter:drop-shadow(0 0 3px rgba(212,174,80,.7))}
+.sc-arc{fill:none;stroke:#C3A469;stroke-width:1.3;stroke-linecap:round;opacity:0;transition:opacity .3s}
+.sc-bar{stroke:#D4AE50;stroke-width:1.8;stroke-linecap:round;transform-box:fill-box;transform-origin:center;transform:scaleY(0);transition:transform .3s cubic-bezier(.2,.7,.2,1)}
+.sonic-cue:hover,.sonic-cue:focus-visible,.sonic-cue.is-playing{width:150px;border-color:var(--gold)}
+.sonic-cue:hover svg,.sonic-cue:focus-visible svg,.sonic-cue.is-playing svg{left:0}
+.sonic-cue:focus-visible{outline:2px solid #E7C877;outline-offset:3px}
+.sonic-cue:hover .sc-bar,.sonic-cue:focus-visible .sc-bar,.sonic-cue.is-playing .sc-bar{transform:scaleY(1)}
+.sonic-cue:hover .sc-a1,.sonic-cue:focus-visible .sc-a1,.sonic-cue.is-playing .sc-a1{opacity:.75}
+.sonic-cue:hover .sc-a2,.sonic-cue:focus-visible .sc-a2,.sonic-cue.is-playing .sc-a2{opacity:.5;transition-delay:.05s}
+.sonic-cue:hover .sc-a3,.sonic-cue:focus-visible .sc-a3,.sonic-cue.is-playing .sc-a3{opacity:.32;transition-delay:.1s}
+.sonic-cue:hover .sc-a4,.sonic-cue:focus-visible .sc-a4,.sonic-cue.is-playing .sc-a4{opacity:.18;transition-delay:.15s}
+.sc-b2{transition-delay:.03s}.sc-b3{transition-delay:.06s}.sc-b4{transition-delay:.09s}.sc-b5{transition-delay:.12s}.sc-b6{transition-delay:.15s}.sc-b7{transition-delay:.18s}.sc-b8{transition-delay:.21s}.sc-b9{transition-delay:.24s}
+.sonic-cue.is-playing .sc-bar{animation:sc-bar 1.1s ease-in-out infinite}
+.sonic-cue.is-playing .sc-b2{animation-delay:.12s}.sonic-cue.is-playing .sc-b3{animation-delay:.3s}.sonic-cue.is-playing .sc-b4{animation-delay:.06s}.sonic-cue.is-playing .sc-b5{animation-delay:.42s}.sonic-cue.is-playing .sc-b6{animation-delay:.2s}.sonic-cue.is-playing .sc-b7{animation-delay:.5s}.sonic-cue.is-playing .sc-b8{animation-delay:.26s}.sonic-cue.is-playing .sc-b9{animation-delay:.36s}
+.sonic-cue.is-playing .sc-arc{animation:sc-arc 1.8s ease-out infinite}
+.sonic-cue.is-playing .sc-a2{animation-delay:.2s}.sonic-cue.is-playing .sc-a3{animation-delay:.4s}.sonic-cue.is-playing .sc-a4{animation-delay:.6s}
+@keyframes sc-bar{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.35)}}
+@keyframes sc-arc{0%{opacity:.8}100%{opacity:.08}}
+@media(prefers-reduced-motion:reduce){.sonic-cue,.sonic-cue svg,.sc-bar,.sc-arc{transition:none}.sonic-cue.is-playing .sc-bar,.sonic-cue.is-playing .sc-arc{animation:none}}
+.sonic-cue[hidden]{display:none}
+@media print{.consent,.sonic-cue,.t-copy,.ao-dial{display:none!important}}
+.hero .byline{grid-template-columns:repeat(auto-fit,minmax(170px,auto))}.hero .byline strong{white-space:nowrap}@media(max-width:640px){.hero .byline strong{white-space:normal}}

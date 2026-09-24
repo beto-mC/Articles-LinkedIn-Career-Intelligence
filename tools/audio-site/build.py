@@ -69,9 +69,11 @@ def transcode(src, dst, fmt, tags):
     subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", str(src), "-map_metadata", "-1", *codec, *meta, str(dst)], check=True)
 
 
-def read_transcript(path):
+def read_transcript(path, corrections=None):
     lines = []
     text = path.read_text(encoding="utf-8")
+    for wrong, right in (corrections or {}).items():
+        text = re.sub(r"\b" + re.escape(wrong) + r"(?=['’]?s?\b)", right, text)
     # Zero-based tools (speaker_0 / SPEAKER_00) shift up by one; one-based labels stay as they are.
     zero_based = re.search(r"^(?:Speaker|Character|SPEAKER)[ _]?0+\s*[:\-]", text, re.M | re.I) is not None
     for raw in text.splitlines():
@@ -96,8 +98,10 @@ def transcript_files(site, pub, a, lines, url):
             + ("Single narrator, labeled Character 1." if a.get("voices") == 1 else
                "Speakers labeled Character 1, Character 2" + (" (turns assigned from the dialogue, not voice analysis)." if a.get("speaker_labels") == "text" else ".")),
             f"Source page: {url}"]
-    for n in a.get("notes", []):
+    for n in a.get("caveats", []) + a.get("notes", []):
         head.append(f"Note: {n}")
+    if site.get("name_corrections"):
+        head.append("Note: names misheard by the transcription tool were corrected to their proper spelling.")
     lic = [f"— {site['publisher']} · {site['publisher_url']}",
            f"Licensed {site['license_name']} ({site['license_plain']}) · {site['rights_url']}"]
     txt = "\n".join(["mAInCharacter", "=" * 13, ""] + head + ["", "-" * 60, ""] +
@@ -113,7 +117,7 @@ ICON_FILE = '<svg class="dl-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M
 ICON_DOC = '<svg class="dl-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2.5h8l4.5 4.5v14.5H6z"/><path d="M14 2.5V7h4.5"/><path d="M9 12h6M9 15h6M9 18h4"/></svg>'
 
 
-def head_block(site, title, desc, canon, og_image, brand, jsonld, noindex, css_href, keywords=()):
+def head_block(site, title, desc, canon, og_image, brand, jsonld, noindex, css_href, keywords=(), sonic=""):
     kw = f'<meta name="keywords" content="{e(", ".join(keywords))}">' if keywords else ""
     robots = '<meta name="robots" content="noindex">' if noindex else '<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">'
     return f"""<!doctype html>
@@ -143,7 +147,7 @@ def head_block(site, title, desc, canon, og_image, brand, jsonld, noindex, css_h
 <link rel="stylesheet" href="{css_href}">
 <script type="application/ld+json">{json.dumps(jsonld, ensure_ascii=False)}</script>
 </head>
-<body>
+<body data-ga="{e(site.get('ga_measurement_id') or '')}" data-sonic="{e(sonic or '')}"{' data-sonic-auto="1"' if site.get('sonic_autoplay') else ''}>
 <a class="skip-link" href="#main">Skip to content</a>
 <div class="diplomatic-rule" aria-hidden="true"></div>
 <div class="read-progress" id="readProgress" aria-hidden="true"></div>"""
@@ -160,7 +164,7 @@ def site_head(site, brand, home, nav):
     return f"""
 <header class="site-head" id="siteHead">
   <div class="sh-inner">
-    <a class="sh-logo" href="{e(home)}" aria-label="mAInCharacter Audio — all episodes">{logo(brand, 'dark', 'sh-lockup')}</a>
+    <a class="sh-logo" href="{e(site['publisher_url'])}" aria-label="mAInCharacter — main-character.me">{logo(brand, 'dark', 'sh-lockup')}</a>
     <nav aria-label="Section navigation">{links}</nav>
     <div class="sh-cta"><a href="{e(site['calendly'])}" target="_blank" rel="noopener">Start the Conversation</a></div>
   </div>
@@ -171,6 +175,16 @@ def license_block(site):
     return (f'<p class="license">— {e(site["publisher"])} · <a href="{e(site["publisher_url"])}">{e(site["publisher_url"])}</a><br>'
             f'Licensed <a href="{e(site["license_url"])}" rel="license">{e(site["license_name"])}</a> ({e(site["license_plain"])}) · '
             f'<a href="{e(site["rights_url"])}">{e(site["rights_url"])}</a></p>')
+
+
+def consent_bar(site):
+    if not site.get("ga_measurement_id"):
+        return ""
+    return ('<div class="consent" id="consent" role="region" aria-label="Analytics choice" hidden>'
+            '<p>This page can count plays and downloads with Google Analytics. No ads, no sale of data. '
+            f'<a href="{e(site["rights_url"])}">Rights &amp; use</a>.</p>'
+            '<div class="consent-btns"><button type="button" class="btn" data-consent="yes">Count me</button>'
+            '<button type="button" class="btn ghost" data-consent="no">No thanks</button></div></div>')
 
 
 def footer(site, brand, extra_links):
@@ -187,17 +201,55 @@ def footer(site, brand, extra_links):
     <p class="mcf-rights">© {dt.date.today().year} <a href="{e(site['publisher_url'])}" class="mcf-link">{e(site['publisher'])}</a>. Licensed <a href="{e(site['license_url'])}" class="mcf-link" rel="license">{e(site['license_name'])}</a>. <a href="{e(site['rights_url'])}" class="mcf-link">Rights &amp; use</a>.</p>
   </nav>
 </footer>
+{consent_bar(site)}
 <button type="button" class="to-top" id="toTop" aria-label="Back to top" hidden><svg viewBox="0 0 15 25" aria-hidden="true"><path d="M7.5 2 L7.5 23 M2 8 L7.5 2 L13 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>"""
 
 
-def player(a, src_rel, label="Listen"):
-    return f"""<div class="ao" role="group" aria-label="Audio: {e(a['title'])}" data-title="{e(a['title'])}">
+EXT = {"image/webp": ".webp", "image/png": ".png", "image/jpeg": ".jpg", "image/svg+xml": ".svg",
+       "font/woff2": ".woff2", "font/woff": ".woff", "audio/mpeg": ".mp3"}
+
+
+def unbundle(src, dest, note):
+    """Unpack a standalone HTML export (manifest + template) into index.html plus its asset files."""
+    import base64, gzip, json
+    text = src.read_text(encoding="utf-8")
+    def block(name):
+        m = re.search(r'<script type="__bundler/' + name + r'"[^>]*>(.*?)</script>', text, re.S)
+        if not m:
+            sys.exit(f"{src.name}: not a standalone export (no {name} block)")
+        return json.loads(m.group(1))
+    manifest, html = block("manifest"), block("template")
+    dest.mkdir(parents=True, exist_ok=True)
+    for i, (uid, meta) in enumerate(manifest.items()):
+        data = base64.b64decode(meta["data"])
+        if meta.get("compressed"):
+            data = gzip.decompress(data)
+        name = f"asset-{i + 1}{EXT.get(meta['mime'], '.bin')}"
+        (dest / name).write_bytes(data)
+        html = html.replace(uid, name)
+    html = html.replace("<title>", "<!-- " + note + " -->\n<title>", 1)
+    (dest / "index.html").write_text(html, encoding="utf-8")
+
+
+RATES = [0.75, 1, 1.25, 1.5, 1.75, 2, 2.25]
+RATE_TICKS = "".join(f'<i data-r="{r}"></i>' for r in RATES)
+
+
+def player(a, src_rel, label="Listen", brand="", home="https://main-character.me/", mark=False):
+    """The audio pill. mark=True adds the gold mC icon (title card only; episode pills stay clean)."""
+    mark_html = (f'\n  <a class="ao-mark" href="{e(home)}" aria-label="mAInCharacter — main-character.me"><img src="{brand}/icon/png/mc-icon-stacked-gold-transparent-2048.png" width="2048" height="2048" alt="" loading="lazy"></a>') if mark else ""
+    return f"""<div class="ao-wrap"><div class="ao" role="group" aria-label="Audio: {e(a['title'])}" data-title="{e(a['title'])}">
   <button type="button" class="ao-play" aria-pressed="false" aria-label="Play {e(a['title'])}"><svg class="ao-i-play" viewBox="0 0 24 24" aria-hidden="true"><polygon points="7 4 20 12 7 20 7 4"/></svg><svg class="ao-i-pause" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="4" width="4.5" height="16" rx="1"/><rect x="13.5" y="4" width="4.5" height="16" rx="1"/></svg></button>
   <span class="ao-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
   <span class="ao-meta"><span class="ao-k">{e(label)}</span><span class="ao-t"><span class="ao-time-current">0:00</span><span class="ao-sep">/</span><span class="ao-time-duration">{clock(a['_dur'])}</span></span></span>
   <input type="range" class="ao-seek" min="0" max="{a['_dur']:.1f}" value="0" step="0.1" aria-label="Seek">
+  <div class="ao-dial" role="group" aria-label="Playback speed">
+    <button type="button" class="ao-step" data-dir="-1" aria-label="Slower">&#8211;</button>
+    <span class="ao-dial-box"><output class="ao-rate-v" aria-live="polite">1.00×</output><span class="ao-ticks" aria-hidden="true">{RATE_TICKS}</span></span>
+    <button type="button" class="ao-step" data-dir="1" aria-label="Faster">+</button>
+  </div>{mark_html}
   <audio preload="none"><source src="{e(src_rel)}" type="audio/mpeg"></audio>
-</div>"""
+</div></div>"""
 
 
 def build(args):
@@ -210,6 +262,18 @@ def build(args):
         sys.exit(f"site.yml: custom_domain is {cd} but site_url is {site['site_url']}. Set site_url: https://{cd} in the same commit.")
     brand = (args.brand_local or site["brand_base"]).rstrip("/")
     out = ROOT / args.out
+    def place_media(ref, dest_dir, rel_prefix):
+        """A URL passes through; a repo path is copied into the site and returned as a relative URL."""
+        if not ref:
+            return ""
+        if re.match(r"^https?://", ref):
+            return ref
+        src = ROOT / ref
+        if not src.exists():
+            sys.exit(f"Media file not found: {ref}")
+        dest_dir.mkdir(parents=True, exist_ok=True)
+        shutil.copy(src, dest_dir / src.name)
+        return f"{rel_prefix}{src.name}"
     if out.exists():
         # keep transcoded audio between local runs; rebuild everything else
         for p in out.iterdir():
@@ -225,6 +289,21 @@ def build(args):
     (out / "assets").mkdir(exist_ok=True)
     for f in ("styles.css", "script.js"):
         shutil.copy(HERE / f, out / "assets" / f)
+    sref = site.get("sonic_log")
+    if sref and not re.match(r"^https?://", sref) and not (ROOT / sref).exists():
+        print(f"Warning: sonic logo {sref} not found (the workflow renders it from tools/audio-site/sonic). Building without it.")
+        sref = ""
+    site["_sonic_root"] = place_media(sref, out / "assets", "assets/")   # from the index
+    arc = (site.get("arcbox") or "").strip()
+    site["_arcbox"] = False
+    if arc:
+        if not (ROOT / arc).exists():
+            sys.exit(f"site.yml: arcbox export not found: {arc}")
+        unbundle(ROOT / arc, out / "assets" / "arcbox",
+                 "Built from " + Path(arc).name + " (the canonical mC Arc Box export) by tools/audio-site/build.py. "
+                 "Only the packaging changed: its image and fonts are separate files. Change the Arc Box in its master and re-export.")
+        site["_arcbox"] = True
+    site["_sonic_sub"] = ("../" + site["_sonic_root"]) if site["_sonic_root"] and not site["_sonic_root"].startswith("http") else site["_sonic_root"]
 
     pubs = []
     for yml in sorted((ROOT / "articles").glob("*/audio.yml")):
@@ -267,6 +346,8 @@ def build(args):
                     f.unlink()   # removed format, renamed or deleted episode
         shutil.rmtree(pdir / "transcripts", ignore_errors=True)
         (pdir / "transcripts").mkdir(parents=True, exist_ok=True)
+        shutil.rmtree(pdir / "media", ignore_errors=True)
+        pub["_hero_art"] = place_media(pub.get("hero_art"), pdir / "media", "media/")
         for a in pub["audio"]:
             src = ROOT / a["master"]
             if not src.exists():
@@ -284,7 +365,7 @@ def build(args):
                     transcode(src, dst, fmt, tags)
                 a["_files"][fmt] = (f"audio/{base}.{fmt}", dst.stat().st_size if dst.exists() else 0)
             tpath = pub["_dir"] / "transcripts" / f"{a['id']}.txt"
-            a["_transcript"] = read_transcript(tpath) if tpath.exists() else []
+            a["_transcript"] = read_transcript(tpath, site.get("name_corrections")) if tpath.exists() else []
             if a["_transcript"]:
                 txt, md = transcript_files(site, pub, a, a["_transcript"], url)
                 (pdir / "transcripts" / f"{base}_transcript.txt").write_text(txt, encoding="utf-8")
@@ -326,7 +407,7 @@ def jsonld_publication(site, brand, pub, url):
     person = {"@type": "Person", "@id": f"{site['publisher_url']}#beto", "name": site["author"], "worksFor": {"@id": org["@id"]}}
     eps = []
     for a in pub["audio"]:
-        eps.append({"@type": "PodcastEpisode", "@id": f"{url}#{a['id']}", "url": f"{url}#{a['id']}", "name": a["title"],
+        eps.append({"@type": "PodcastEpisode", "@id": f"{url}#{a['id']}", "url": f"{url}#{a['id']}", "name": a["title"], "alternateName": a.get("file_title"),
                     "description": a["summary"], "datePublished": pub["date"], "inLanguage": site["language"],
                     "timeRequired": iso_dur(a["_dur"]), "author": {"@id": person["@id"]}, "publisher": {"@id": org["@id"]},
                     "copyrightHolder": {"@id": org["@id"]}, "license": site["license_url"],
@@ -361,15 +442,28 @@ def title_html(pub):
     return e(t)
 
 
+def hero_art(site, pub):
+    """Top-right of the title card: a publication image if set, else the site's Arc Box."""
+    if pub.get("_hero_art"):
+        return (f'<figure class="hero-art"><img src="{e(pub["_hero_art"])}" alt="{e(pub.get("hero_art_alt") or "")}" '
+                'loading="eager" decoding="async"></figure>')
+    if site.get("_arcbox") and pub.get("arcbox", True) is not False:
+        return ('<div class="hero-art hero-arc" aria-hidden="true"><iframe src="../assets/arcbox/index.html" '
+                'title="mAInCharacter Arc Box" tabindex="-1" loading="lazy"></iframe></div>')
+    return ""
+
+
 def render_publication(site, brand, pub, pdir, url, draft):
     first = pub["audio"][0]
+    art = hero_art(site, pub)
     th = pub.get("thesis") or {}
     nav = ([("Thesis", "#thesis")] if th else []) + [(a.get("nav") or a.get("generator_format") or a["title"], f"#{a['id']}") for a in pub["audio"]] + [("All audio", "../")]
     parts = [head_block(site, f"{pub['title']} — {site['site_name']} | mAInCharacter", pub["description"], url,
                         f"{brand}/favicon/og-image-1200x630.png", brand, jsonld_publication(site, brand, pub, url), draft,
-                        "../assets/styles.css", pub.get("keywords", [])),
+                        "../assets/styles.css", pub.get("keywords", []), site["_sonic_sub"]),
              site_head(site, brand, "../", nav), '<main class="wrap" id="main">',
-             f"""<div class="hero">
+             f"""<div class="hero{' has-art' if art else ''}">
+  {art}
   <div class="hero-text">
     <div class="hero-logo"><a href="{e(site['publisher_url'])}" aria-label="mAInCharacter home">{logo(brand, 'dark', 'mc-lockup')}</a></div>
     <nav class="crumbs" aria-label="Breadcrumb"><a href="../">Audio</a> <span aria-hidden="true">/</span> <span>{e(pub.get('series') or pub['title'])}</span></nav>
@@ -377,7 +471,7 @@ def render_publication(site, brand, pub, pdir, url, draft):
     <h1>{title_html(pub)}</h1>
     <p class="deck">{e(pub.get('deck'))}</p>
     {f'<p class="deck define">{md_inline(pub["define"])}</p>' if pub.get('define') else ''}
-    {player(first, first['_files']['mp3'][0], 'Listen · ' + first.get('generator_format', ''))}
+    {player(first, first['_files']['mp3'][0], 'Listen · ' + first.get('generator_format', ''), brand, site['publisher_url'], mark=True)}
     <div class="byline"><span>By<strong>{e(site['author'])} · {BRAND}</strong></span><span>Published<strong><time datetime="{e(pub['date'])}">{dt.date.fromisoformat(pub['date']).strftime('%B %-d, %Y')}</time></strong></span><span>Form<strong>Audio · {len(pub['audio'])} episode{'s' if len(pub['audio']) != 1 else ''}</strong></span></div>
     {f'<a class="back" href="{e(pub["canonical_article"])}">Read the full article →</a>' if pub.get('canonical_article') else ''}
   </div>
@@ -397,27 +491,38 @@ def render_publication(site, brand, pub, pdir, url, draft):
 </section>""")
     for a in pub["audio"]:
         n += 1
-        dls = "".join(f'<a class="dl" href="{e(rel)}" download><span class="dl-badge">{ICON_FILE}<b>{FMT[k]["label"]}</b></span><span class="dl-t">{FMT[k]["note"]}<small>{mb(size)}</small></span></a>'
+        dls = "".join(f'<a class="dl" href="{e(rel)}" download data-track="download" data-format="{k}" data-title="{e(a["title"])}"><span class="dl-badge">{ICON_FILE}<b>{FMT[k]["label"]}</b></span><span class="dl-size">{mb(size)}</span><span class="sr">{FMT[k]["note"]}</span></a>'
                       for k, (rel, size) in a["_files"].items())
-        tdl = "".join(f'<a class="dl dl--doc" href="{e(rel)}" download><span class="dl-badge">{ICON_DOC}<b>{k.upper()}</b></span><span class="dl-t">Transcript<small>{"Markdown" if k == "md" else "Plain text"}</small></span></a>'
+        tdl = "".join(f'<a class="dl dl--doc" href="{e(rel)}" download data-track="transcript_download" data-format="{k}" data-title="{e(a["title"])}"><span class="dl-badge">{ICON_DOC}<b>{k.upper()}</b></span><span class="dl-size">{"Markdown" if k == "md" else "Plain text"}</span></a>'
                       for k, rel in a.get("_tfiles", {}).items())
-        notes = "".join(f"<li>{e(x)}</li>" for x in a.get("notes", []))
+        quotes = "".join(f'<li><span class="q-mark" aria-hidden="true">“</span>{e(q)}</li>' for q in (a.get("quotes") or [])[:3])
         refs = "".join(f'<li><a href="{e(r["url"])}">{e(r["label"])}</a></li>' for r in a.get("references", []))
         tnote = e(a.get("transcript_source", "machine transcription")) + " · " + ("single narrator" if a.get("voices") == 1 else "speakers labeled Character 1, Character 2")
-        lines = "".join(f'<p><b class="who w{w.split()[-1]}">{e(w)}</b> {e(s)}</p>' for w, s in a["_transcript"])
+        lines = "".join(f'<p><b class="who w{w.split()[-1]}">{e(w)}</b> {e(s_)}</p>' for w, s_ in a["_transcript"])
         parts.append(f"""<section class="episode" id="{e(a['id'])}">
-  <div class="section-header"><div class="section-number">{n:02d}</div><div><span class="sh-eyebrow">{e(a.get('kind'))}</span><h2>{e(a['title'])}</h2></div></div>
-  <dl class="ep-meta"><div><dt>Made with</dt><dd>{e(a['generator'])}</dd></div><div><dt>Format</dt><dd>{e(a.get('generator_format'))}</dd></div><div><dt>Voices</dt><dd>{a.get('voices', '')} AI</dd></div><div><dt>Length</dt><dd>{clock(a['_dur'])}</dd></div></dl>
-  <div class="summary"><p class="eyebrow">For the listener</p><p>{e(a['summary'])}</p>{f'<p class="listen-for"><span>Listen for</span>{e(a["listen_for"])}</p>' if a.get('listen_for') else ''}</div>
-  {player(a, a['_files']['mp3'][0])}
-  {f'<aside class="worth"><p class="eyebrow">Worth knowing</p><ul>{notes}</ul></aside>' if notes else ''}
-  <div class="downloads"><p class="eyebrow">Download</p><div class="dl-row">{dls}</div>{f'<p class="dl-sub">Transcript</p><div class="dl-row">{tdl}</div>' if tdl else ''}</div>
+  <div class="section-header"><div class="section-number">{n:02d}</div><div><span class="sh-eyebrow">{e(a.get('kind'))} · {clock(a['_dur'])}</span><h2>{e(a['title'])}</h2></div></div>
+  <p class="summary-p">{e(a['summary'])}</p>
+  <div class="ep-grid">
+    <div class="ep-main">
+      {player(a, a['_files']['mp3'][0], 'Listen', brand, site['publisher_url'])}
+      {f'<p class="listen-for"><span>Listen for</span>{e(a["listen_for"])}</p>' if a.get('listen_for') else ''}
+      {f'<div class="quotes"><p class="eyebrow">Key quotes</p><ul>{quotes}</ul></div>' if quotes else ''}
+    </div>
+    <aside class="ep-side" aria-label="Downloads">
+      <p class="eyebrow">Audio</p><div class="dl-list">{dls}</div>
+      {f'<p class="eyebrow">Transcript</p><div class="dl-list">{tdl}</div>' if tdl else ''}
+      <dl class="ep-meta"><div><dt>Made with</dt><dd>{e(a['generator'])}</dd></div><div><dt>Voices</dt><dd>{a.get('voices', '')} AI</dd></div></dl>
+    </aside>
+  </div>
+  {f'<div class="t-reveal" data-reveal="transcript"><div class="t-head-row"><button type="button" class="t-head" aria-expanded="false" aria-controls="t-{e(a["id"])}"><span class="t-label">Transcript</span><span class="t-sub">{tnote}</span><span class="dn-cue" aria-hidden="true">+</span><span class="t-cue-l">Full transcript</span></button><button type="button" class="t-copy" data-copy="t-{e(a["id"])}" data-title="{e(a["title"])}" aria-label="Copy the full transcript">Copy</button></div><div class="t-body" id="t-{e(a["id"])}">{lines}</div></div>' if lines else ''}
   {f'<div class="refs"><p class="eyebrow">References</p><ul>{refs}</ul></div>' if refs else ''}
-  {f'<div class="t-reveal" data-reveal="transcript"><button type="button" class="t-head" aria-expanded="false" aria-controls="t-{e(a["id"])}"><span class="t-label">Transcript</span><span class="t-sub">{tnote}</span><span class="dn-cue" aria-hidden="true">+</span><span class="t-cue-l">Full transcript</span></button><div class="t-body" id="t-{e(a["id"])}">{lines}</div></div>' if lines else ''}
-  <p class="attrib">AI-generated audio: {e(a['generator'])}, {e(a.get('generator_format'))} format. Voices are synthetic and may contain errors. Written summary and notes by {BRAND}.</p>
+  <p class="attrib">AI-generated audio: {e(a['generator'])}, {e(a.get('generator_format'))} format. Voices are synthetic and may contain errors. Written summary, title and notes by {BRAND}.</p>
 </section>""")
     if pub.get("questions"):
-        qa = "".join(f'<div class="qa-item"><dt>{e(q["q"])}</dt><dd>{e(q["a"])}</dd></div>' for q in pub["questions"])
+        def qa_item(q):
+            src = f' <a class="qa-src" href="{e(q["source"])}">In the article →</a>' if q.get("source") else ""
+            return f'<div class="qa-item"><dt>{e(q["q"])}</dt><dd>{e(q["a"])}{src}</dd></div>'
+        qa = "".join(qa_item(q) for q in pub["questions"])
         parts.append(f'<section class="qa" id="questions"><p class="eyebrow">Short answers</p><h2>Questions this publication answers</h2><dl>{qa}</dl></section>')
     parts.append(closing(site))
     parts.append(f'<div class="colophon">{e(site["author"])} · {BRAND} · {e(pub.get("series") or "")} · {dt.date.fromisoformat(pub["date"]).strftime("%B %Y")}{license_block(site)}</div></main>')
@@ -452,7 +557,7 @@ def render_index(site, brand, pubs, out):
           "publisher": {"@type": "Organization", "name": site["publisher"], "url": site["publisher_url"]}, "license": site["license_url"],
           "mainEntity": {"@type": "ItemList", "itemListElement": [{"@type": "ListItem", "position": i + 1, "url": f"{url}{p['slug']}/", "name": p["title"]} for i, p in enumerate(listed)]}}
     html_ = [head_block(site, f"{site['site_name']} | mAInCharacter", site["tagline"] + " Audio companions by Beto Cruz.", url,
-                        f"{brand}/favicon/og-image-1200x630.png", brand, ld, False, "assets/styles.css"),
+                        f"{brand}/favicon/og-image-1200x630.png", brand, ld, False, "assets/styles.css", (), site["_sonic_root"]),
              site_head(site, brand, "./", [("Episodes", "#registry"), ("main-character.me", site["publisher_url"])]),
              f"""<main class="wrap" id="main">
 <div class="hero"><div class="hero-text">
