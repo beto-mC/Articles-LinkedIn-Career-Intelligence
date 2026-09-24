@@ -46,6 +46,13 @@ jobs:
           node tools/audio-site/sonic/render.mjs "$(command -v google-chrome || command -v chromium)" "$SRC" "$OUT"
       - name: Build
         run: python tools/audio-site/build.py --out _site
+      - name: Check claims against sources (TypeSafe Jev)
+        # Quotes are matched word for word; summaries and short answers are judged by Jev when the
+        # TYPESAFE_API_KEY secret is set. Report only: it shows in the run summary and never blocks.
+        continue-on-error: true
+        env:
+          TYPESAFE_API_KEY: ${{ secrets.TYPESAFE_API_KEY }}
+        run: python tools/audio-site/verify_claims.py
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
