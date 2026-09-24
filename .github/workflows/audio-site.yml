@@ -6,6 +6,7 @@ on:
     paths:
       - "articles/**"
       - "site.yml"
+      - "assets/**"
       - "tools/audio-site/**"
       - "mC - */**"
       - ".github/workflows/audio-site.yml"
@@ -33,6 +34,16 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg
           pip install -q -r tools/audio-site/requirements.txt
+      - name: Render the sonic logo
+        # From the mC Sonic Constellation export named by sonic_source in site.yml, unless an MP3
+        # is committed at sonic_log. If this step fails, the site builds without the sonic logo.
+        continue-on-error: true
+        run: |
+          OUT=$(python -c "import yaml;print(yaml.safe_load(open('site.yml')).get('sonic_log') or '')")
+          SRC=$(python -c "import yaml;print(yaml.safe_load(open('site.yml')).get('sonic_source') or '')")
+          if [ -z "$OUT" ] || [ -z "$SRC" ] || [ -f "$OUT" ]; then echo "Nothing to render"; exit 0; fi
+          npm install --no-save --no-package-lock --silent playwright-core@1
+          node tools/audio-site/sonic/render.mjs "$(command -v google-chrome || command -v chromium)" "$SRC" "$OUT"
       - name: Build
         run: python tools/audio-site/build.py --out _site
       - uses: actions/configure-pages@v5
