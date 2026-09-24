@@ -13,6 +13,8 @@ description: "Three audio companions to Beto Cruz's AI Quotient article: what AI
 deck: "Your expertise should help write the operating rules — not simply become a cost inside somebody else's model."
 define: "It is called your **AI Quotient — AIQ**: how well you can put AI to work, check what it produces, and lead others doing the same. Think of an experienced professional becoming the conductor. You know the score, give each section its part, listen for what is off, and decide when the work is ready. AI can help perform the parts; your judgment keeps the whole thing coherent."
 canonical_article: https://main-character.me/ai-quotient.html
+hero_art: ""                 # optional image for the title card; empty = the mC Arc Box (site.yml arcbox)
+hero_art_alt: ""
 notes_url: https://github.com/beto-mC/Articles-LinkedIn-Career-Intelligence/tree/main/articles/2026-09-21-ai-quotient
 keywords: [AI Quotient, AIQ, AI fluency for executives, agent orchestration, career intelligence, mAInCharacter, Beto Cruz]
 
@@ -38,19 +40,24 @@ thesis:
 questions:
   - q: What is the AI Quotient (AIQ)?
     a: "AI Quotient (AIQ) is how well you use AI, check its work, and lead others doing the same."
+    source: https://main-character.me/ai-quotient.html#summary
   - q: How do you prove AI's value inside an organization?
     a: "Five gateways, in order: Unit → Sponsor → Baseline → Reviewer → Mandate. Rehearse on permitted work, run one bounded pilot with an independent reviewer, then earn a wider, revocable mandate."
+    source: https://main-character.me/ai-quotient.html#wedge
   - q: Do more AI agents mean better work?
     a: "No. Give each agent a distinct job. Judge the result after checking and corrections."
+    source: https://main-character.me/ai-quotient.html#thesis
   - q: Who does what when a professional works with AI?
     a: "The human defines what is useful, sets the standard, and challenges the result. AI finds material, prepares a first version, and surfaces a result to review."
+    source: https://main-character.me/ai-quotient.html#thesis
 
 audio:
   - id: ai-with-the-ai-quotient
-    title: "AI with the AI Quotient"
-    kind: Website audio
+    title: "Conducting AI: the AI Quotient for senior leaders"
+    file_title: "AI with the AI Quotient"
+    kind: Deep Dive · two hosts
     master: "mC - Beto Pubs/Website_-_AI_with_the_AI_Quotient.m4a"
-    generator: "Gemini Notebook (formerly NotebookLM)"
+    generator: "Gemini Notebook"
     generator_format: "Deep Dive"
     # internal only: how the generator was identified
     generator_basis: "file metadata encoder=Google; opens with 'Welcome to today's deep dive'"
@@ -59,15 +66,20 @@ audio:
     speaker_labels: text
     summary: "Two AI hosts walk through Beto Cruz's AI Quotient framework, aimed at senior corporate, finance and legal leaders. They open with the conductor analogy, then cover the five gateways for proving AI inside an organization (unit, sponsor, baseline, reviewer, mandate), why more agents do not automatically mean better work, the 12 cumulative operating stages, and three conditional future horizons."
     listen_for: "The closing question: as agents start negotiating for you, the boundary that matters is not who can talk but who can commit."
-    notes:
+    quotes:
+      - "In the world of AI, done is just not the same as right."
+      - "More agents do not automatically improve quality."
+      - "If your agents sign a bad contract at light speed, you are still the one who has to face the music."
+    caveats:
       - "Some examples the hosts use, such as an agent that reported a website task as done when the page had not changed, are their illustrations and are not quoted in the published article."
     references:
       - {label: "AI Quotient — the full article", url: "https://main-character.me/ai-quotient.html"}
   - id: speedboats-vs-cargo-ships
-    title: "AI Speedboats versus Corporate Cargo Ships"
-    kind: Companion audio
+    title: "Build outside or prove it inside? Where professionals capture AI's value"
+    file_title: "AI Speedboats versus Corporate Cargo Ships"
+    kind: Debate · two hosts
     master: "articles/2026-09-21-ai-quotient/AI_Speedboats_versus_Corporate_Cargo_Ships.m4a"
-    generator: "Gemini Notebook (formerly NotebookLM)"
+    generator: "Gemini Notebook"
     generator_format: "Debate"
     generator_basis: "labeled on main-character.me as 'Audio Overview generated with Gemini Notebook'; opens with 'Welcome to the debate'"
     voices: 2
@@ -75,24 +87,33 @@ audio:
     speaker_labels: text
     summary: "Two AI hosts take opposite sides on where professionals capture AI's value. One argues for the outside wedge: lean, AI-native services built outside a firm, the speedboat. The other defends the article's inside wedge: prove one improvement inside your institution and turn that trust into a better role, the cargo ship. Along the way they cover IQ versus EQ, the 12 operating stages, and the delegated-economy horizon."
     listen_for: "Why commitments made at machine speed still need human conductors who can challenge, audit and stop them."
-    notes:
-      - "The machine transcript renders the author's surname as \"Caruso\" in two places. The author is Beto Cruz."
+    quotes:
+      - "No matter how fast that speedboat is, the cargo ship still holds all the paying customers."
+      - "Human judgment is the essential bridge between that raw generated work and actual usable business value."
+      - "The harness doesn't decide if we're heading in the right direction."
+    caveats:
       - "The \"Madison test\" figures in this episode (about 135 human hours and up to $45,000 of consulting value at no cost) do not appear in the published article. Treat them as unverified."
     references:
       - {label: "AI Quotient — the full article", url: "https://main-character.me/ai-quotient.html"}
       - {label: "David J. Deming, “The Growing Importance of Social Skills in the Labor Market,” Quarterly Journal of Economics 132(4), 2017", url: "https://academic.oup.com/qje/article-abstract/132/4/1593/3861633"}
   - id: lead-like-an-ai-conductor
-    title: "Lead your work like an AI conductor"
-    kind: LinkedIn audio · The Brief
+    title: "The brief: AIQ, the conductor, and Amara's ask"
+    file_title: "Lead your work like an AI conductor"
+    kind: The Brief · one narrator
     master: "mC - Publications/Amara_-_LinkedInLead_your_work_like_an_AI_conductor.m4a"
-    generator: "Gemini Notebook (formerly NotebookLM)"
+    generator: "Gemini Notebook"
     generator_format: "The Brief"
     generator_basis: "file metadata encoder=Google; opens with 'This is the brief'"
     voices: 1
     transcript_source: "ElevenLabs Scribe v1 machine transcription"
     summary: "A single AI narrator gives the short version in about a minute and a half: the conductor idea, what AIQ is and is not (not coding, not an intelligence test), and Amara's example of using an approved AI tool to document an expanded role before asking for recognition."
     listen_for: "Where the AI's job ends: it prepared the case, but Amara still managed the relationships and made the ask."
-    notes:
+    quotes:
+      - "Just being good at your job isn't the whole job anymore."
+      - "AIQ isn't about knowing how to code, and it's definitely not an intelligence test."
+      - "The AI prepped the case, but Amara still had to manage the relationships and make the actual human ask."
+    caveats:
       - "Amara is one of the article's illustrative situations, not a real client."
     references:
       - {label: "AI Quotient — the full article", url: "https://main-character.me/ai-quotient.html"}
+      - {label: "Amara's situation in the article", url: "https://main-character.me/ai-quotient.html#jn-ama"}
