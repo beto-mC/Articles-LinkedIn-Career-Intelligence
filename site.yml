@@ -27,3 +27,20 @@ size_budget_mb: 750          # the build fails above this (GitHub Pages sites sh
 # AI crawler policy for robots.txt: search/answer bots are always allowed.
 # 'block' keeps model-training crawlers out; 'allow' lets them in.
 ai_training_crawlers: block
+# Google Analytics 4 measurement ID (G-XXXXXXXXXX). Empty = no analytics at all.
+# When set, GA loads only after a visitor accepts the consent bar; it records plays,
+# downloads and transcript copies, nothing else. See UPDATING.md.
+ga_measurement_id: "G-80FW775JMB"   # mC Web stream (15086425448). Empty = no analytics.
+# The sonic logo: a small gold dot, bottom left. Hover shows the waves; pressing plays it.
+# Repo path or URL. Empty = off.
+sonic_log: assets/mc-sonic-constellation.mp3   # the sonic logo button, bottom left; empty = off
+sonic_source: assets/mC_Sonic_Constellation_standalone.html   # the workflow renders sonic_log from this export
+sonic_autoplay: false        # true = also play once on a visitor's first tap or click
+# The mC Arc Box export (canonical embed, gold on charcoal), top-right of every title card.
+# To update it, replace this file with a new export of the same name.
+# A publication can set hero_art to show an image instead, or arcbox: false to hide it.
+arcbox: assets/mC_Arc_Box_-_Embed_standalone.html
+# Spellings the machine transcripts get wrong, corrected at build time.
+name_corrections:
+  "Beto Caruso": "Beto Cruz"
+  "Caruso": "Cruz"
