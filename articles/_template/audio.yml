@@ -11,6 +11,8 @@ description: ""              # one sentence, under 160 characters (search result
 deck: ""
 define: ""                   # optional; **bold** allowed
 canonical_article: ""        # the article page on main-character.me
+hero_art: ""                 # optional image for the title card; empty = the mC Arc Box (site.yml arcbox)
+hero_art_alt: ""
 notes_url: ""
 keywords: []
 thesis:                      # optional block; delete it if the page is audio only
@@ -24,13 +26,14 @@ thesis:                      # optional block; delete it if the page is audio on
   pull: ""
   pull_cite: ""
   closing_line: ""
-questions: []                # - {q: "", a: ""}  answers quoted from the article
+questions: []                # - {q: "", a: "", source: "https://main-character.me/<article>.html#<section>"}
 audio:
   - id: short-kebab-name     # becomes the download file names
-    title: ""
-    kind: ""                 # e.g. Companion audio, LinkedIn audio
+    title: ""                # derived from what the audio is about (its opening), not the file name
+    file_title: ""           # the original/export name, kept for the record
+    kind: ""                 # e.g. "Deep Dive · two hosts", "The Brief · one narrator"
     master: ""               # repo path to the .m4a/.mp3/.wav exported from Gemini Notebook
-    generator: "Gemini Notebook (formerly NotebookLM)"
+    generator: "Gemini Notebook"
     generator_format: ""     # Deep Dive | The Brief | The Critique | The Debate
     generator_basis: ""      # internal: how you know
     voices: 2
@@ -38,7 +41,8 @@ audio:
     speaker_labels: voice     # voice (from the transcription tool) | text (assigned by reading)
     summary: ""              # 2-3 sentences, what the listener gets
     listen_for: ""
-    notes: []                # corrections, unverified claims, illustrative personas
+    quotes: []               # up to 3 short verbatim lines from the audio, shown as Key Quotes
+    caveats: []              # unverified claims, illustrative personas; shown in the transcript header only
     references: []           # - {label: "", url: ""}
     # transcript: put transcripts/<id>.txt next to this file. Lines start with
     # "Speaker 1:" or "Character 1:" — the build relabels Speaker N as Character N.
